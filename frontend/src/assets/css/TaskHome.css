@@ -1,0 +1,260 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+/* Container */
+.home {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* HERO SECTION */
+.hero {
+  padding: 120px 20px;
+  text-align: center;
+  background: #ffffff00;
+}
+
+.hero h1 {
+  font-size: 56px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 22px;
+  color: #6e6e73;
+  margin-bottom: 40px;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.primary-btn {
+  background: #1c4a77;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.primary-btn:hover {
+  background: #005bb5;
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid #111;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.secondary-btn:hover {
+  background: #111;
+  color: white;
+}
+
+/* PRODUCTS SECTION */
+.products {
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  align-items: center;
+}
+
+/* Card style Apple */
+.product-card {
+  max-width: 800px;
+  text-align: center;
+  padding: 60px 40px;
+  border-radius: 20px;
+  background: #1f1f28;
+  transition: all 0.3s ease;
+}
+
+.product-card h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.product-card p {
+  font-size: 18px;
+  color: #6e6e73;
+  margin-bottom: 10px;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Empty state */
+.empty-state h2 {
+  font-size: 36px;
+  margin-bottom: 15px;
+}
+
+.empty-state p {
+  font-size: 18px;
+  color: #6e6e73;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 40px;
+  }
+
+  .hero p {
+    font-size: 18px;
+  }
+
+  .product-card {
+    padding: 40px 20px;
+  }
+}
+.task-input-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.task-input {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+  width: 220px;
+  transition: 0.2s ease;
+}
+
+.task-input:focus {
+  border-color: #0071e3;
+  box-shadow: 0 0 0 3px rgba(0,113,227,0.2);
+}
+
+.confirm-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #0071e3;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.confirm-btn:hover {
+  background: #005bb5;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* CREATE TASK CONTAINER */
+.create-task-box {
+  margin-top: 30px;
+  display: flex;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+/* INPUT */
+.create-input {
+  flex: 1;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.create-input::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+.create-input:focus {
+  border-color: #0071e3;
+  box-shadow: 0 0 0 3px rgba(0,113,227,0.2);
+}
+
+/* SELECT */
+.create-select {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.create-select:focus {
+  border-color: #0071e3;
+}
+
+/* BUTTON */
+.create-confirm {
+  padding: 14px 22px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #0071e3, #005bb5);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.create-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,113,227,0.4);
+}
+

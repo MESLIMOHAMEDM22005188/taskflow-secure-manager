@@ -1,54 +1,56 @@
-// TaskController.jsx (English messages only: add title validation)
-
 import { useEffect, useState } from "react";
 import TaskModel from "../models/TaskModel";
 import { TaskView } from "../views/TaskView";
 
 export default function TaskController({ token, logout }) {
+
   const [tasks, setTasks] = useState([]);
-  const [title, setTitle] = useState("");
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [priority, setPriority] = useState("medium");
+  const [filter, setFilter] = useState("all");
 
   const model = new TaskModel(token);
 
   const loadTasks = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await model.getTasks();
-      setTasks(data);
-    } catch (err) {
-      console.error("Load tasks error:", err);
-
-      if (err.response?.status === 401) {
-        localStorage.removeItem("token");
-        if (typeof logout === "function") logout();
-        else window.location.reload();
-      } else {
-        setError("Unable to load tasks.");
-      }
-    } finally {
-      setLoading(false);
-    }
+    const data = await model.getTasks();
+    setTasks(data);
   };
 
-  const addTask = async () => {
-    if (!title.trim()) {
-      setError("Task title is required.");
-      return;
-    }
+  const addTask = async (newTitle) => {
+  if (!newTitle.trim()) return;
 
-    try {
-      setError(null);
-      await model.createTask(title.trim());
-      setTitle("");
-      await loadTasks();
-    } catch (err) {
-      console.error("Create task error:", err);
-      setError("Unable to create task.");
-    }
-  };
+  const createdTask = await model.createTask({
+    title: newTitle,
+    priority,
+    status: "todo"
+  });
+
+  setTasks(prev => [...prev, createdTask]);
+};
+
+
+  const deleteTask = async (id) => {
+  await model.deleteTask(id);
+  setTasks(prev => prev.filter(t => t.id !== id));
+};
+
+
+  const toggleStatus = async (task) => {
+  const newStatus = task.status === "todo" ? "done" : "todo";
+
+  await model.updateTask(task.id, { status: newStatus });
+
+  setTasks(prev =>
+    prev.map(t =>
+      t.id === task.id ? { ...t, status: newStatus } : t
+    )
+  );
+};
+
+
+  const filteredTasks = tasks.filter(task => {
+    if (filter === "all") return true;
+    return task.status === filter;
+  });
 
   useEffect(() => {
     loadTasks();
@@ -56,13 +58,17 @@ export default function TaskController({ token, logout }) {
 
   return (
     <TaskView
-      tasks={tasks}
-      title={title}
-      setTitle={setTitle}
+      tasks={filteredTasks}
       addTask={addTask}
-      error={error}
-      loading={loading}
+      deleteTask={deleteTask}
+      toggleStatus={toggleStatus}
       logout={logout}
+      priority={priority}
+      setPriority={setPriority}
+      filter={filter}
+      setFilter={setFilter}
+      totalTasks={tasks.length}
+      completedTasks={tasks.filter(t => t.status === "done").length}
     />
   );
 }

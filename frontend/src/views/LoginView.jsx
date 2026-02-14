@@ -1,4 +1,4 @@
-// LoginView.jsx (English messages only + disabled button)
+import "../assets/css/login.css";
 
 export function LoginView({
   email,
@@ -11,69 +11,52 @@ export function LoginView({
   const isDisabled = !email || password.length < 6;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>TaskFlow</h2>
-        <p style={styles.subtitle}>Sign in</p>
+    <div className="login-container">
+      <form className="form" autoComplete="off">
+        
+        <div className="control">
+          <h1>Sign In</h1>
+        </div>
 
-        {error && <p style={styles.error}>{error}</p>}
+        {error && <p className="error">{error}</p>}
 
-        <input
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className="control block-cube block-input">
+          <input
+            type="text"
+            placeholder="Username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <div className="bg-top"><div className="bg-inner"></div></div>
+          <div className="bg-right"><div className="bg-inner"></div></div>
+          <div className="bg"><div className="bg-inner"></div></div>
+        </div>
 
-        <input
-          style={styles.input}
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="control block-cube block-input">
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <div className="bg-top"><div className="bg-inner"></div></div>
+          <div className="bg-right"><div className="bg-inner"></div></div>
+          <div className="bg"><div className="bg-inner"></div></div>
+        </div>
 
-        <button style={styles.button} onClick={handleLogin} disabled={isDisabled}>
-          Sign in
+        <button
+          type="button"
+          className="btn block-cube block-cube-hover"
+          onClick={handleLogin}
+          disabled={isDisabled}
+        >
+          <div className="bg-top"><div className="bg-inner"></div></div>
+          <div className="bg-right"><div className="bg-inner"></div></div>
+          <div className="bg"><div className="bg-inner"></div></div>
+          <div className="text">Log In</div>
         </button>
-      </div>
+
+      </form>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#f5f6fa"
-  },
-  card: {
-    background: "white",
-    padding: "40px",
-    borderRadius: "12px",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-    width: "320px",
-    textAlign: "center"
-  },
-  title: { marginBottom: "5px" },
-  subtitle: { marginBottom: "20px", color: "#777" },
-  input: {
-    width: "100%",
-    padding: "10px",
-    marginBottom: "15px",
-    borderRadius: "6px",
-    border: "1px solid #ddd"
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "6px",
-    border: "none",
-    background: "#4f46e5",
-    color: "white",
-    cursor: "pointer"
-  },
-  error: { color: "red", marginBottom: "10px" }
-};
