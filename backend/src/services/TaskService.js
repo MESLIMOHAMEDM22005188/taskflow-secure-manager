@@ -9,40 +9,59 @@ class TaskService {
     return prisma.task.create({
       data: {
         title: task.title,
-        description: task.description,
         status: task.status,
         priority: task.priority,
-        userId
+        userId,
+        themeId: data.themeId || null
+      },
+      include: {
+        theme: true
       }
     });
   }
 
   async list(userId) {
-    return prisma.task.findMany({ where: { userId }, orderBy: { createdAt: "desc" } });
+    return prisma.task.findMany({
+      where: { userId: String(userId) },
+      include: { theme: true },
+      orderBy: { createdAt: "desc" }
+    });
   }
 
   async update(userId, id, data) {
-    const existing = await prisma.task.findFirst({ where: { id: Number(id), userId } });
+    const existing = await prisma.task.findFirst({
+      where: { id, userId }
+    });
+
     if (!existing) throw new Error("NotFound");
 
     const task = new Task({ ...existing, ...data });
     task.validate();
 
     return prisma.task.update({
-      where: { id: Number(id) },
+      where: { id },
       data: {
         title: task.title,
-        description: task.description,
         status: task.status,
-        priority: task.priority
+        priority: task.priority,
+        themeId: data.themeId ?? existing.themeId
+      },
+      include: {
+        theme: true
       }
     });
   }
 
   async remove(userId, id) {
-    const existing = await prisma.task.findFirst({ where: { id: Number(id), userId } });
+    const existing = await prisma.task.findFirst({
+      where: { id, userId }
+    });
+
     if (!existing) throw new Error("NotFound");
-    await prisma.task.delete({ where: { id: Number(id) } });
+
+    await prisma.task.delete({
+      where: { id }
+    });
   }
 }
 

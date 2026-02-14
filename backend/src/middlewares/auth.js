@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
   const token = header.split(" ")[1];
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload; // { userId, role }
+req.user = { ...payload, userId: String(payload.userId) };
     next();
   } catch {
     return res.status(401).json({ message: "Invalid token" });
