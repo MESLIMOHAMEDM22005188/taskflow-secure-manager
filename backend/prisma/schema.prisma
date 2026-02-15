@@ -13,8 +13,8 @@ model User {
   password  String
   createdAt DateTime @default(now())
 
-  tasks  Task[]
-  themes Theme[]
+  tasks     Task[]
+  themes    Theme[]
 }
 
 model Theme {
@@ -23,23 +23,22 @@ model Theme {
   color     String
   createdAt DateTime @default(now())
 
-  user   User   @relation(fields: [userId], references: [id])
   userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  tasks Task[]
+  tasks  Task[]
 }
-
 
 model Task {
   id        String   @id @default(uuid())
   title     String
-  status    String
   priority  String
+  completed Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user   User   @relation(fields: [userId], references: [id])
   userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  theme   Theme?  @relation(fields: [themeId], references: [id])
   themeId String?
+  theme   Theme?  @relation(fields: [themeId], references: [id], onDelete: SetNull)
 }

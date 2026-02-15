@@ -1,12 +1,16 @@
 import { useState } from "react";
 import "../assets/css/TaskHome.css";
 
+const DEFAULT_THEME_COLOR = "#1E3A8A";
+const MAX_THEMES = 7;
+
 export function TaskView({
   tasks = [],
   addTask,
   deleteTask,
   toggleStatus,
   logout,
+  deleteTheme,
   priority,
   setPriority,
   filter,
@@ -19,18 +23,22 @@ export function TaskView({
 }) {
   const [showInput, setShowInput] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [newThemeName, setNewThemeName] = useState("");
-  const [newThemeColor, setNewThemeColor] = useState("#1E3A8A");
+  const [newThemeColor, setNewThemeColor] = useState(DEFAULT_THEME_COLOR);
+  const [selectedTheme, setSelectedTheme] = useState("");
 
-  // Couleur de thème = ACCENT uniquement (pas fond)
-  const accentColor = currentTheme?.color || "#1E3A8A";
+  const accentColor = currentTheme?.color || DEFAULT_THEME_COLOR;
 
   const handleSubmit = () => {
     if (!newTitle.trim()) return;
 
-    addTask(newTitle);
+    addTask({
+      title: newTitle,
+      priority,
+      themeId: selectedTheme || null
+    });
+
     setNewTitle("");
     setShowInput(false);
   };
@@ -40,18 +48,24 @@ export function TaskView({
 
     await createTheme(newThemeName, newThemeColor);
     setNewThemeName("");
-    setNewThemeColor("#1E3A8A");
+    setNewThemeColor(DEFAULT_THEME_COLOR);
     setShowThemeModal(false);
   };
+
+  const handleDeleteTheme = (themeId) => {
+    deleteTheme(themeId);
+  };
+
+  const canAddMoreThemes = themes.length < MAX_THEMES;
 
   return (
     <div className="home">
       <header className="topbar">
         <div className="header-left">
           <button className="theme-btn" onClick={() => setShowThemeModal(true)}>
-            Mes thèmes
+            My Themes
           </button>
-          <button className="graph-btn">Graphique</button>
+          <button className="graph-btn">Chart</button>
         </div>
 
         <button className="logout-btn" onClick={logout}>
@@ -65,23 +79,26 @@ export function TaskView({
             <h2>Manage Themes</h2>
 
             <div className="theme-previews">
-              {themes.length === 0 && <p>Aucun thème pour le moment</p>}
+              {themes.length === 0 && <p>No themes yet</p>}
 
               {themes.map((theme) => (
-                <button
+                <div
                   key={theme.id}
-                  type="button"
                   className="theme-preview-item"
                   style={{ backgroundColor: theme.color }}
-                  // Ici tu peux sélectionner le thème si tu passes une prop setCurrentTheme
-                  // onClick={() => setCurrentTheme(theme)}
                 >
                   <span>{theme.name}</span>
-                </button>
+                  <button
+                    className="delete-theme-btn"
+                    onClick={() => handleDeleteTheme(theme.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               ))}
             </div>
 
-            {themes.length < 7 && (
+            {canAddMoreThemes && (
               <div className="theme-form">
                 <input
                   type="text"
@@ -140,9 +157,9 @@ export function TaskView({
               <button
                 className="create-theme-btn"
                 onClick={() => setShowThemeModal(true)}
-                disabled={themes.length >= 7}
+                disabled={!canAddMoreThemes}
               >
-                {themes.length >= 7 ? "Max 7 Themes" : "+ Create Theme"}
+                {canAddMoreThemes ? "+ Create Theme" : `Max ${MAX_THEMES} Themes`}
               </button>
 
               {themes.length > 0 && (
@@ -163,29 +180,16 @@ export function TaskView({
           )}
 
           <div className="filter-group">
-            <button
-              className={filter === "all" ? "active-filter" : ""}
-              onClick={() => setFilter("all")}
-              style={filter === "all" ? { borderColor: accentColor } : undefined}
-            >
-              All
-            </button>
-
-            <button
-              className={filter === "todo" ? "active-filter" : ""}
-              onClick={() => setFilter("todo")}
-              style={filter === "todo" ? { borderColor: accentColor } : undefined}
-            >
-              Todo
-            </button>
-
-            <button
-              className={filter === "done" ? "active-filter" : ""}
-              onClick={() => setFilter("done")}
-              style={filter === "done" ? { borderColor: accentColor } : undefined}
-            >
-              Done
-            </button>
+            {["all", "todo", "done"].map((filterOption) => (
+              <button
+                key={filterOption}
+                className={filter === filterOption ? "active-filter" : ""}
+                onClick={() => setFilter(filterOption)}
+                style={filter === filterOption ? { borderColor: accentColor } : undefined}
+              >
+                {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
+              </button>
+            ))}
           </div>
 
           {showInput && (
@@ -207,11 +211,31 @@ export function TaskView({
                 <option value="high">High</option>
               </select>
 
-              <button className="create-confirm" onClick={handleSubmit} style={{ backgroundColor: accentColor }}>
+              <select
+                className="create-select"
+                value={selectedTheme}
+                onChange={(e) => setSelectedTheme(e.target.value)}
+              >
+                <option value="">No Theme</option>
+                {themes.map((theme) => (
+                  <option key={theme.id} value={theme.id}>
+                    {theme.name}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                className="create-confirm"
+                onClick={handleSubmit}
+                style={{ backgroundColor: accentColor }}
+              >
                 Add
               </button>
 
-              <button className="create-cancel" onClick={() => setShowInput(false)}>
+              <button
+                className="create-cancel"
+                onClick={() => setShowInput(false)}
+              >
                 Cancel
               </button>
             </div>
@@ -223,9 +247,30 @@ export function TaskView({
         {tasks.length === 0 && <p className="empty-state">No tasks yet</p>}
 
         {tasks.map((task) => (
-          <div key={task.id} className="product-card">
+          <div
+            key={task.id}
+            className="product-card"
+            style={{
+              borderLeft: task.theme?.color
+                ? `6px solid ${task.theme.color}`
+                : "6px solid #2f2f2f"
+            }}
+          >
             <h2>{task.title}</h2>
-            <p>Status: {task.status}</p>
+
+            {task.theme && (
+              <p
+                style={{
+                  color: task.theme.color,
+                  fontWeight: "500",
+                  marginTop: "4px"
+                }}
+              >
+                Theme: {task.theme.name}
+              </p>
+            )}
+
+            <p>Status: {task.completed ? "Done" : "To Do"}</p>
 
             <span className={`priority-badge priority-${task.priority}`}>
               {task.priority.toUpperCase()}

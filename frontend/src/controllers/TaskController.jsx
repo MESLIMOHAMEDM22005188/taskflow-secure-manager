@@ -67,22 +67,16 @@ export default function TaskController({ token, logout }) {
     }
   };
 
-  const addTask = async (newTitle, themeId) => {
-    if (!newTitle.trim()) return;
+  const addTask = async (taskData) => {
+  try {
+    const createdTask = await model.createTask(taskData);
 
-    try {
-      const createdTask = await model.createTask({
-        title: newTitle,
-        priority,
-        status: "todo",
-        themeId
-      });
+    setTasks((prev) => [...prev, createdTask]);
+  } catch (err) {
+    console.error("CREATE TASK ERROR:", err);
+  }
+};
 
-      setTasks(prev => [...prev, createdTask]);
-    } catch (err) {
-      console.error("CREATE TASK ERROR:", err);
-    }
-  };
 
   const deleteTask = async (id) => {
     try {
