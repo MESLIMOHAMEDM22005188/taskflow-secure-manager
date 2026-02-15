@@ -53,8 +53,9 @@ export function TaskView({
   };
 
   const handleDeleteTheme = (themeId) => {
-    deleteTheme(themeId);
-  };
+  console.log("DELETE CLICKED:", themeId);
+  deleteTheme(themeId);
+};
 
   const canAddMoreThemes = themes.length < MAX_THEMES;
 
@@ -242,47 +243,107 @@ export function TaskView({
           )}
         </div>
       </section>
-
       <section className="products">
-        {tasks.length === 0 && <p className="empty-state">No tasks yet</p>}
 
-        {tasks.map((task) => (
-          <div
-            key={task.id}
-            className="product-card"
-            style={{
-              borderLeft: task.theme?.color
-                ? `6px solid ${task.theme.color}`
-                : "6px solid #2f2f2f"
-            }}
-          >
-            <h2>{task.title}</h2>
+  {/* Progression par thème */}
+  <div className="progress-section">
+    {themes.map(theme => {
+      const themeTasks = tasks.filter(t => t.theme?.id === theme.id);
+      const completedThemeTasks = themeTasks.filter(t => t.completed);
 
-            {task.theme && (
-              <p
-                style={{
-                  color: task.theme.color,
-                  fontWeight: "500",
-                  marginTop: "4px"
-                }}
-              >
-                Theme: {task.theme.name}
-              </p>
-            )}
+      return (
+        <div key={theme.id} className="progress-block">
+          <h3 style={{ color: theme.color }}>
+            {theme.name}
+          </h3>
 
-            <p>Status: {task.completed ? "Done" : "To Do"}</p>
+          <p>
+            {completedThemeTasks.length} / {themeTasks.length}
+          </p>
 
-            <span className={`priority-badge priority-${task.priority}`}>
-              {task.priority.toUpperCase()}
-            </span>
-
-            <div className="card-actions">
-              <button onClick={() => toggleStatus(task)}>Toggle</button>
-              <button onClick={() => deleteTask(task.id)}>Delete</button>
-            </div>
+          <div className="progress-container">
+            <div
+              className="progress-bar"
+              style={{
+                backgroundColor: theme.color,
+                width:
+                  themeTasks.length === 0
+                    ? "0%"
+                    : `${(completedThemeTasks.length / themeTasks.length) * 100}%`
+              }}
+            />
           </div>
-        ))}
-      </section>
+        </div>
+      );
+    })}
+  </div>
+
+  {/* Barre des thèmes */}
+  <div className="theme-bar">
+
+    {/* Bouton All */}
+    <div
+  className={`theme-bar-item ${filter === "all" ? "active-theme" : ""}`}
+  onClick={() => setFilter("all")}
+>
+</div>
+
+    {themes.map(theme => {
+      const themeTasks = tasks.filter(t => t.theme?.id === theme.id);
+
+      return (
+        <div
+          key={theme.id}
+          className={`theme-bar-item ${filter === theme.id ? "active-theme" : ""}`}
+          style={{ borderColor: theme.color }}
+          onClick={() => setFilter(theme.id)}
+        >
+        </div>
+      );
+    })}
+  </div>
+
+  {tasks.length === 0 && <p className="empty-state">No tasks yet</p>}
+
+  {tasks.map((task) => (
+    <div
+      key={task.id}
+      className="product-card"
+      style={{
+        borderLeft: task.theme?.color
+          ? `6px solid ${task.theme.color}`
+          : "6px solid #2f2f2f"
+      }}
+    >
+      <h2>{task.title}</h2>
+
+      {task.theme && (
+        <p
+          style={{
+            color: task.theme.color,
+            fontWeight: "500",
+            marginTop: "4px"
+          }}
+        >
+          Theme: {task.theme.name}
+        </p>
+      )}
+
+      <p>Status: {task.completed ? "Done" : "To Do"}</p>
+
+      <span className={`priority-badge priority-${task.priority}`}>
+        {task.priority.toUpperCase()}
+      </span>
+
+      <div className="card-actions">
+        <button onClick={() => toggleStatus(task)}>Toggle</button>
+        <button onClick={() => deleteTask(task.id)}>Delete</button>
+      </div>
+    </div>
+  ))}
+
+</section>
+
     </div>
   );
 }

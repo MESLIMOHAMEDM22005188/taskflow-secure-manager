@@ -76,7 +76,16 @@ export default function TaskController({ token, logout }) {
     console.error("CREATE TASK ERROR:", err);
   }
 };
+  const deleteTheme = async (themeId) => {
+    try {
+      await themeModel.deleteTheme(themeId);
 
+      setThemes(prev => prev.filter(t => t.id !== themeId));
+      await loadTasks();
+    } catch (err) {
+      console.error("DELETE THEME ERROR:", err);
+    }
+  };
 
   const deleteTask = async (id) => {
     try {
@@ -88,25 +97,30 @@ export default function TaskController({ token, logout }) {
   };
 
   const toggleStatus = async (task) => {
-    const newStatus = task.status === "todo" ? "done" : "todo";
+  try {
+    await model.updateTask(task.id, {
+      completed: !task.completed
+    });
 
-    try {
-      await model.updateTask(task.id, { status: newStatus });
+    setTasks(prev =>
+      prev.map(t =>
+        t.id === task.id
+          ? { ...t, completed: !t.completed }
+          : t
+      )
+    );
+  } catch (err) {
+    console.error("TOGGLE ERROR:", err);
+  }
+};
 
-      setTasks(prev =>
-        prev.map(t =>
-          t.id === task.id ? { ...t, status: newStatus } : t
-        )
-      );
-    } catch (err) {
-      console.error("TOGGLE ERROR:", err);
-    }
-  };
+
 
   const filteredTasks = tasks.filter(task => {
-    if (filter === "all") return true;
-    return task.status === filter;
-  });
+  if (filter === "all") return true;
+  if (filter === "done") return task.completed;
+  if (filter === "todo") return !task.completed;
+});
 
   return (
     <TaskView
@@ -115,12 +129,13 @@ export default function TaskController({ token, logout }) {
       deleteTask={deleteTask}
       toggleStatus={toggleStatus}
       logout={logout}
+      deleteTheme={deleteTheme}
       priority={priority}
       setPriority={setPriority}
       filter={filter}
       setFilter={setFilter}
       totalTasks={tasks.length}
-      completedTasks={tasks.filter(t => t.status === "done").length}
+      completedTasks={tasks.filter(t => t.completed).length}
       themes={themes}
       createTheme={createTheme}
       currentTheme={currentTheme}

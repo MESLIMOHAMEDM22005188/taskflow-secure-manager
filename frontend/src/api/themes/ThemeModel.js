@@ -1,7 +1,7 @@
 export default class ThemeModel {
   constructor(token) {
     this.token = token;
-this.baseUrl = "http://localhost:3000/api/themes";
+    this.baseUrl = "http://localhost:3000/api/themes";
   }
 
   async getThemes() {
