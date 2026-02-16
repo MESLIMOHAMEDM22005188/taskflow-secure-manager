@@ -20,7 +20,7 @@ module.exports = (req, res, next) => {
     console.log("✅ Token valid");
     console.log("Payload:", payload);
 
-    req.user = { ...payload, userId: String(payload.userId) };
+req.user = { ...payload, userId: payload.userId };
     next();
 
   } catch (err) {

@@ -1,18 +1,14 @@
-import { useState, useEffect } from "react";
-import "../assets/css/login.css";
+import { useState } from "react";
+import "../assets/css/register.css";
 
-export default function LoginView({ onSuccess, goRegister, goHome }) {
+export default function Register({ onSuccess, goLogin, goHome }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    console.log("LOGIN VIEW RENDERED");
-  }, []);
-
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -28,17 +24,14 @@ export default function LoginView({ onSuccess, goRegister, goHome }) {
       onSuccess(data.token);
 
     } catch {
-      setError("Login failed");
+      setError("Registration failed");
     }
   };
 
   return (
-    <div className="container">
-      <div className="top"></div>
-      <div className="bottom"></div>
-
-      <div className="center">
-        <h2>Login</h2>
+    <div className="login-container">
+      <div className="form">
+        <h1>Create Account</h1>
 
         {error && <p className="error">{error}</p>}
 
@@ -55,16 +48,15 @@ export default function LoginView({ onSuccess, goRegister, goHome }) {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button onClick={handleLogin}>Login</button>
+        <button onClick={handleRegister}>Register</button>
 
-        <div style={{ marginTop: "20px" }}>
-          <p onClick={goRegister} style={{ cursor: "pointer" }}>
-            Create account
-          </p>
-          <p onClick={goHome} style={{ cursor: "pointer" }}>
-            Back
-          </p>
-        </div>
+        <p onClick={goLogin} style={{ cursor: "pointer" }}>
+          Already have account
+        </p>
+
+        <p onClick={goHome} style={{ cursor: "pointer" }}>
+          Back
+        </p>
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ class ThemeService {
 
   const existing = await prisma.theme.findFirst({
   where: {
-    userId: String(userId),
+    userId: userId,
     name: formattedName
   }
 });
@@ -30,7 +30,7 @@ class ThemeService {
   }
 
   const count = await prisma.theme.count({
-    where: { userId: String(userId) }
+    where: {userId: userId}
   });
 
   if (count >= 7) {

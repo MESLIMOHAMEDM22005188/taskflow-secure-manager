@@ -120,6 +120,9 @@ export default function TaskController({ token, logout }) {
   if (filter === "all") return true;
   if (filter === "done") return task.completed;
   if (filter === "todo") return !task.completed;
+
+  return task.theme?.id === filter;
+  
 });
 
   return (

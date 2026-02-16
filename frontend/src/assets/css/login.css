@@ -1,154 +1,178 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap");
+
+/* RESET SAFE */
 *,
-*::after,
-*::before {
+*::before,
+*::after {
   box-sizing: border-box;
-}
-
-body {
   margin: 0;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #212121;
-  color: #fff;
-  font-family: monospace, serif;
-  letter-spacing: 0.05em;
+  padding: 0;
 }
 
-h1 {
-  font-size: 23px;
-}
-
-.form {
-  width: 300px;
-  padding: 64px 15px 24px;
-  margin: 0 auto;
-}
-
-.control {
-  margin-bottom: 24px;
-}
-
-.control input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 0;
+/* On ne touche PAS html/body */
+html, body {
+  height: auto;
   background: transparent;
-  color: #fff;
-  font-family: monospace, serif;
-  letter-spacing: 0.05em;
-  font-size: 16px;
+  font-family: "Raleway", sans-serif;
 }
 
-.control input:hover,
-.control input:focus {
-  outline: none;
-}
+/* =============================== */
+/* ROOT ISOLÉ */
+/* =============================== */
 
-.btn {
-  width: 100%;
-  display: block;
-  padding: 14px 16px;
-  background: transparent;
-  border: 0;
-  color: #fff;
-  letter-spacing: 0.1em;
-  font-weight: bold;
-  font-family: monospace;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.block-cube {
+#root {
   position: relative;
-}
-
-.block-cube .bg-top {
-  position: absolute;
-  height: 10px;
-  background: linear-gradient(90deg, #020024 0%, #340979 37%, #00d4ff 94%);
-  bottom: 100%;
-  left: 5px;
-  right: -5px;
-  transform: skew(-45deg, 0);
-}
-
-.block-cube .bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, #020024 0%, #340979 37%, #00d4ff 94%);
-}
-
-.block-cube .bg-right {
-  position: absolute;
-  background: #00d4ff;
-  top: -5px;
-  bottom: 5px;
-  width: 10px;
-  left: 100%;
-  transform: skew(0, -45deg);
-}
-
-.block-cube .bg-inner {
-  background: #212121;
-  position: absolute;
-  inset: 2px;
-  transition: all 0.2s ease-in-out;
-}
-
-.block-cube-hover:hover .bg-inner {
-  top: 100%;
-}
-
-.credits {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  padding: 15px;
-  width: 100%;
-  z-index: 111;
-}
-
-.credits a {
-  opacity: 0.6;
-  color: #fff;
-  font-size: 11px;
-  text-decoration: none;
-}
-
-.credits a:hover {
-  opacity: 1;
-}
-
-.login-container {
+  width: 100vw;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  overflow: hidden;
+  background: #111;
+  font-family: "Raleway", sans-serif;
 }
-.login-form {
-  background-color: #1a1a1a;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+
+/* =============================== */
+/* MAIN CONTAINER */
+/* =============================== */
+
+.container {
+  position: relative;
   width: 100%;
-  max-width: 400px;
-}
-.block-cube input {
-  position: relative;
-  z-index: 2;
+  height: 100%;
 }
 
-.block-cube .text {
-  position: relative;
-  z-index: 2;
-}
+/* =============================== */
+/* DIAGONAL BACKGROUND */
+/* =============================== */
 
-.block-cube .bg-inner {
-  background: #212121;
+.top,
+.bottom {
   position: absolute;
-  inset: 2px;
-  transition: all 0.2s ease-in-out;
-  z-index: 1;   /* ajoute ceci */
+  width: 100%;
+  height: 100%;
+}
+
+.top::before,
+.top::after,
+.bottom::before,
+.bottom::after {
+  content: "";
+  position: absolute;
+  width: 200vmax;
+  height: 200vmax;
+  top: 50%;
+  left: 50%;
+  margin-top: -100vmax;
+  transform-origin: 0 50%;
+  transition: all 0.7s cubic-bezier(.445,.05,0,1);
+  opacity: 0.65;
+}
+
+/* COLORS */
+.top::before {
+  transform: rotate(45deg);
+  background: #e46569;
+}
+
+.top::after {
+  transform: rotate(135deg);
+  background: #ecaf81;
+}
+
+.bottom::before {
+  transform: rotate(-45deg);
+  background: #60b8d4;
+}
+
+.bottom::after {
+  transform: rotate(-135deg);
+  background: #3745b5;
+}
+
+/* HOVER ANIMATION */
+.container:hover .top::before,
+.container:hover .top::after,
+.container:hover .bottom::before,
+.container:hover .bottom::after {
+  margin-left: 200px;
+  transform-origin: -200px 50%;
+}
+
+/* =============================== */
+/* CENTER CARD */
+/* =============================== */
+
+.center {
+  position: absolute;
+  width: 380px;
+  padding: 40px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgb(0, 0, 0);
+  border-radius: 8px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  text-align: center;
+  z-index: 10;
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: 
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+.container:hover .center {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+
+
+/* TITLE */
+
+.center h2 {
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+/* INPUTS */
+
+.center input {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* BUTTON */
+
+.center button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 3px;
+  background: #333;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.center button:hover {
+  background: #111;
+}
+
+.center p {
+  margin-top: 15px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #666;
+}
+
+.center p:hover {
+  color: #000;
 }

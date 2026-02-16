@@ -11,7 +11,7 @@ class TaskService {
         title: task.title,
         priority: task.priority,
         completed: false,
-        userId: String(userId),
+        userId: userId,
         themeId: data.themeId || null
       },
       include: {
@@ -41,9 +41,9 @@ class TaskService {
     return prisma.task.update({
       where: { id },
       data: {
+        completed: data.completed ?? existing.completed,
         title: task.title,
         priority: task.priority,
-        completed: data.completed ?? existing.completed,
         themeId: data.themeId ?? existing.themeId
       },
       include: {
@@ -54,13 +54,15 @@ class TaskService {
 
   async remove(userId, id) {
     const existing = await prisma.task.findFirst({
-      where: { id, userId: String(userId) }
+    where: {id:id,  userId: userId }
+
     });
 
     if (!existing) throw new Error("NotFound");
 
     await prisma.task.delete({
-      where: { id }
+      where: { id, userId: userId }
+  
     });
   }
 }

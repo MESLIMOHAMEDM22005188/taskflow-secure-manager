@@ -27,15 +27,12 @@ exports.list = async (req, res) => {
   }
 };
 
-
 exports.remove = async (req, res) => {
   try {
     await themeService.remove(req.user.userId, req.params.id);
     res.json({ message: "Theme deleted" });
   } catch (e) {
-    if (e.message === "NotFound") {
-      return res.status(404).json({ message: "Theme not found" });
-    }
-    return res.status(400).json({ message: e.message || "Bad request" });
+    res.status(400).json({ message: e.message });
   }
 };
+
