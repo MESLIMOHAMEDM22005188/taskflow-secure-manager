@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import TaskModel from "../models/TaskModel";
 import { TaskView } from "../views/TaskView";
 import ThemeModel from "../api/themes/ThemeModel";
 import ProfileView from "../views/ProfileView";
 
 export default function TaskController({ token, logout }) {
-
-  const model = new TaskModel();
-  const themeModel = new ThemeModel(token);
+  const model = useMemo(() => new TaskModel(), []);
+  const themeModel = useMemo(() => new ThemeModel(token), [token]);
 
   const [tasks, setTasks] = useState([]);
   const [themes, setThemes] = useState([]);
@@ -16,51 +15,38 @@ export default function TaskController({ token, logout }) {
   const [currentTheme, setCurrentTheme] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
 
-  useEffect(() => {
-  console.log("🔵 CONTROLLER MOUNTED");
-  console.log("TOKEN:", token);
-
-  if (token) {
-    loadTasks();
-    loadThemes();
-  }
-}, [token]);
-if (showProfile) {
-  return <ProfileView goBack={() => setShowProfile(false)} />;
-  console.log("🔴 RENDER CHECK - showProfile:", showProfile);
-}
-
-
-
-
-  const loadTasks = async () => {
-  console.log("🟡 loadTasks called");
-
-  try {
-    const data = await model.getTasks();
-    console.log("🟢 DATA FROM API:", data);
-    console.log("🟢 TYPE:", typeof data);
-    console.log("🟢 IS ARRAY:", Array.isArray(data));
-
-    setTasks(data);
-
-  } catch (err) {
-    console.error("🔴 LOAD TASKS ERROR:", err);
-  }
-};
-  
-  const loadThemes = async () => {
+  const loadTasks = useCallback(async () => {
     try {
-      const themes = await themeModel.getThemes();
-      setThemes(themes);
+      const data = await model.getTasks();
+      setTasks(data);
+    } catch (err) {
+      console.error("LOAD TASKS ERROR:", err);
+    }
+  }, [model]);
 
-      if (themes.length > 0) {
-        setCurrentTheme(themes[0]);
+  const loadThemes = useCallback(async () => {
+    try {
+      const loadedThemes = await themeModel.getThemes();
+      setThemes(loadedThemes);
+
+      if (loadedThemes.length > 0) {
+        setCurrentTheme(loadedThemes[0]);
       }
     } catch (err) {
       console.error("LOAD THEMES ERROR:", err);
     }
-  };
+  }, [themeModel]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const timer = setTimeout(() => {
+      loadTasks();
+      loadThemes();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [token, loadTasks, loadThemes]);
 
   const createTheme = async (themeName, themeColor) => {
     try {
@@ -69,26 +55,25 @@ if (showProfile) {
         color: themeColor
       });
 
-      setThemes(prev => [...prev, newTheme]);
+      setThemes((prev) => [...prev, newTheme]);
     } catch (err) {
       alert(err.message);
     }
   };
 
   const addTask = async (taskData) => {
-  try {
-    const createdTask = await model.createTask(taskData);
+    try {
+      const createdTask = await model.createTask(taskData);
+      setTasks((prev) => [...prev, createdTask]);
+    } catch (err) {
+      console.error("CREATE TASK ERROR:", err);
+    }
+  };
 
-    setTasks((prev) => [...prev, createdTask]);
-  } catch (err) {
-    console.error("CREATE TASK ERROR:", err);
-  }
-};
   const deleteTheme = async (themeId) => {
     try {
       await themeModel.deleteTheme(themeId);
-
-      setThemes(prev => prev.filter(t => t.id !== themeId));
+      setThemes((prev) => prev.filter((t) => t.id !== themeId));
       await loadTasks();
     } catch (err) {
       console.error("DELETE THEME ERROR:", err);
@@ -98,46 +83,37 @@ if (showProfile) {
   const deleteTask = async (id) => {
     try {
       await model.deleteTask(id);
-      setTasks(prev => prev.filter(t => t.id !== id));
+      setTasks((prev) => prev.filter((t) => t.id !== id));
     } catch (err) {
       console.error("DELETE ERROR:", err);
     }
   };
 
   const toggleStatus = async (task) => {
-  try {
-    await model.updateTask(task.id, {
-      completed: !task.completed
-    });
+    try {
+      await model.updateTask(task.id, {
+        completed: !task.completed
+      });
 
-    setTasks(prev =>
-      prev.map(t =>
-        t.id === task.id
-          ? { ...t, completed: !t.completed }
-          : t
-      )
-    );
-  } catch (err) {
-    console.error("TOGGLE ERROR:", err);
+      setTasks((prev) =>
+        prev.map((t) => (t.id === task.id ? { ...t, completed: !t.completed } : t))
+      );
+    } catch (err) {
+      console.error("TOGGLE ERROR:", err);
+    }
+  };
+
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "all") return true;
+    if (filter === "done") return task.completed;
+    if (filter === "todo") return !task.completed;
+
+    return task.theme?.id === filter;
+  });
+
+  if (showProfile) {
+    return <ProfileView goBack={() => setShowProfile(false)} logout={logout} />;
   }
-};
-
-  const handleProfile = () => {
-  console.log("🟡 CONTROLLER: setShowProfile(true)");
-  setShowProfile(true);
-};
-
-
-  const filteredTasks = tasks.filter(task => {
-  if (filter === "all") return true;
-  if (filter === "done") return task.completed;
-  if (filter === "todo") return !task.completed;
-
-  return task.theme?.id === filter;
-  
-}
-
-);
 
   return (
     <TaskView
@@ -152,7 +128,7 @@ if (showProfile) {
       filter={filter}
       setFilter={setFilter}
       totalTasks={tasks.length}
-      completedTasks={tasks.filter(t => t.completed).length}
+      completedTasks={tasks.filter((t) => t.completed).length}
       themes={themes}
       createTheme={createTheme}
       currentTheme={currentTheme}
