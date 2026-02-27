@@ -290,8 +290,6 @@ export function TaskView({
 </div>
 
     {themes.map(theme => {
-      const themeTasks = tasks.filter(t => t.theme?.id === theme.id);
-
       return (
         <div
           key={theme.id}
