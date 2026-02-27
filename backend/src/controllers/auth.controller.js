@@ -46,25 +46,40 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
+    console.log("===== LOGIN ATTEMPT =====");
+    console.log("BODY:", req.body);
+
     const { username, password } = req.body;
 
     if (!username || !password) {
+      console.log("❌ Missing fields");
       return res.status(400).json({ message: "Missing fields" });
     }
+
+    console.log("🔍 Searching user:", username);
 
     const user = await prisma.user.findUnique({
       where: { username }
     });
 
+    console.log("USER FROM DB:", user);
+
     if (!user) {
+      console.log("❌ User not found");
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    console.log("🔐 Comparing passwords...");
     const ok = await bcrypt.compare(password, user.password);
 
+    console.log("PASSWORD MATCH:", ok);
+
     if (!ok) {
+      console.log("❌ Password mismatch");
       return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    console.log("✅ Password correct, generating token");
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
@@ -72,13 +87,15 @@ exports.login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
+    console.log("TOKEN GENERATED");
+
     return res.json({
       message: "Login ok",
       token
     });
 
   } catch (error) {
-    console.error("LOGIN ERROR:", error);
+    console.error("🔥 LOGIN ERROR:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };

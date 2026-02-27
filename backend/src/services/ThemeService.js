@@ -30,8 +30,9 @@ class ThemeService {
   }
 
   const count = await prisma.theme.count({
-    where: {userId: userId}
-  });
+where: { id, userId: Number(userId) }
+
+});
 
   if (count >= 7) {
     throw new Error("Maximum of 7 themes allowed");
@@ -41,14 +42,14 @@ class ThemeService {
     data: {
       name: formattedName,
       color: data.color,
-      userId: String(userId)
+      userId: Number(userId)
     }
   });
 }
 
     async list(userId) {
   return prisma.theme.findMany({
-    where: { userId: String(userId) }
+    where: { userId: Number(userId) }
   });
 }
 
@@ -56,7 +57,7 @@ class ThemeService {
   const existing = await prisma.theme.findFirst({
     where: { 
       id,
-      userId: String(userId)
+      userId: Number(userId)
     }
   });
 

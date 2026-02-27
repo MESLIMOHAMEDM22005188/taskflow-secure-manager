@@ -1,25 +1,19 @@
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
 
-const authRoutes = require("./src/routes/auth.routes");
-const taskRoutes = require("./src/routes/task.routes");
-const themeRoutes = require("./src/routes/theme.routes");
+const authMiddleware = require("./src/middlewares/auth");
 
 const app = express();
 
 app.use(cors());
-app.use(helmet());
-app.use(morgan("dev"));
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/themes", themeRoutes);
+// ROUTES PUBLIQUES
+app.use("/api/auth", require("./src/routes/auth"));
 
-app.get("/", (req, res) => {
-  res.json({ message: "TaskFlow API running" });
-});
+// ROUTES PROTÉGÉES
+app.use("/api/tasks", authMiddleware, require("./src/routes/task.routes"));
+app.use("/api/themes", authMiddleware, require("./src/routes/theme.routes"));
+app.use("/api/users", authMiddleware, require("./src/routes/user.routes"));
 
 module.exports = app;

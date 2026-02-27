@@ -6,22 +6,39 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const router = express.Router();
 
+/* =========================
+   REGISTER
+========================= */
 router.post("/register", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    console.log("📩 BODY:", req.body);
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
+
+    console.log("📩 Register:", username, email);
+
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: email },
+          { username: username }
+        ]
+      }
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Username or email already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {
+        username,
         email,
         password: hashedPassword
       }
@@ -30,13 +47,23 @@ router.post("/register", async (req, res) => {
     res.json({ message: "User created", userId: user.id });
 
   } catch (err) {
+    console.error("❌ REGISTER ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
+/* =========================
+   LOGIN
+========================= */
 router.post("/login", async (req, res) => {
   try {
+    console.log("🔐 BODY:", req.body);
+
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Missing credentials" });
+    }
 
     const user = await prisma.user.findUnique({
       where: { email }
@@ -61,6 +88,7 @@ router.post("/login", async (req, res) => {
     res.json({ token });
 
   } catch (err) {
+    console.error("❌ LOGIN ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });

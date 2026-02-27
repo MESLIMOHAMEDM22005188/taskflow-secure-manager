@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import TaskModel from "../models/TaskModel";
 import { TaskView } from "../views/TaskView";
 import ThemeModel from "../api/themes/ThemeModel";
+import ProfileView from "../views/ProfileView";
 
 export default function TaskController({ token, logout }) {
 
@@ -13,15 +14,23 @@ export default function TaskController({ token, logout }) {
   const [priority, setPriority] = useState("medium");
   const [filter, setFilter] = useState("all");
   const [currentTheme, setCurrentTheme] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
   console.log("🔵 CONTROLLER MOUNTED");
   console.log("TOKEN:", token);
-  console.log("LOCAL STORAGE TOKEN:", localStorage.getItem("token"));
 
-  loadTasks();
-  loadThemes();
-}, []);
+  if (token) {
+    loadTasks();
+    loadThemes();
+  }
+}, [token]);
+if (showProfile) {
+  return <ProfileView goBack={() => setShowProfile(false)} />;
+  console.log("🔴 RENDER CHECK - showProfile:", showProfile);
+}
+
+
 
 
   const loadTasks = async () => {
@@ -39,8 +48,7 @@ export default function TaskController({ token, logout }) {
     console.error("🔴 LOAD TASKS ERROR:", err);
   }
 };
-
-
+  
   const loadThemes = async () => {
     try {
       const themes = await themeModel.getThemes();
@@ -114,6 +122,10 @@ export default function TaskController({ token, logout }) {
   }
 };
 
+  const handleProfile = () => {
+  console.log("🟡 CONTROLLER: setShowProfile(true)");
+  setShowProfile(true);
+};
 
 
   const filteredTasks = tasks.filter(task => {
@@ -123,7 +135,9 @@ export default function TaskController({ token, logout }) {
 
   return task.theme?.id === filter;
   
-});
+}
+
+);
 
   return (
     <TaskView
@@ -143,6 +157,7 @@ export default function TaskController({ token, logout }) {
       createTheme={createTheme}
       currentTheme={currentTheme}
       setCurrentTheme={setCurrentTheme}
+      onProfile={() => setShowProfile(true)}
     />
   );
 }

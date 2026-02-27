@@ -8,4 +8,5 @@ router.use(auth);
 router.post("/", themeController.create);
 router.get("/", themeController.list);
 router.delete("/:id", themeController.remove);
+
 module.exports = router;

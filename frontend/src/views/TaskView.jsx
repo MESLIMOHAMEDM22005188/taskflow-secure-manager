@@ -19,7 +19,8 @@ export function TaskView({
   completedTasks,
   createTheme,
   themes = [],
-  currentTheme
+  currentTheme,
+  onProfile,
 }) {
   const [showInput, setShowInput] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -63,11 +64,11 @@ export function TaskView({
     <div className="home">
       <header className="topbar">
         <div className="header-left">
-          <button className="theme-btn" onClick={() => setShowThemeModal(true)}>
-            My Themes
-          </button>
+          <button className="theme-btn" onClick={() => setShowThemeModal(true)}>My Themes</button>
           <button className="graph-btn">Chart</button>
+          <button className="profile-btn" onClick={onProfile}>Profile</button>
         </div>
+        
 
         <button className="logout-btn" onClick={logout}>
           Logout

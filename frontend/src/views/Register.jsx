@@ -3,6 +3,7 @@ import "../assets/css/register.css";
 
 export default function Register({ onSuccess, goLogin, goHome }) {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");   // ✅ AJOUT
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
@@ -11,19 +12,20 @@ export default function Register({ onSuccess, goLogin, goHome }) {
       const res = await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, email, password }) // ✅ AJOUT email
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message);
+        setError(data.message || "Registration failed");
         return;
       }
 
       onSuccess(data.token);
 
-    } catch {
+    } catch (err) {
+      console.error("❌ FRONT REGISTER ERROR:", err);
       setError("Registration failed");
     }
   };
@@ -39,6 +41,14 @@ export default function Register({ onSuccess, goLogin, goHome }) {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+        />
+
+        {/* ✅ NOUVEAU CHAMP EMAIL */}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <input

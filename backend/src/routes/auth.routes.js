@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../controllers/auth.controller");
+const auth = require("../middlewares/auth");
+const userController = require("../controllers/user.controller");
 
-router.post("/register", auth.register);
-router.post("/login", auth.login);
+router.use(auth);
+
+router.get("/me", userController.getProfile);
+router.patch("/username", userController.updateUsername);
+router.patch("/password", userController.updatePassword);
 
 module.exports = router;

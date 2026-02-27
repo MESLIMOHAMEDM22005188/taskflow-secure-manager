@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import api from "../api/axios";
 import "../assets/css/login.css";
 
 export default function LoginView({ onSuccess, goRegister, goHome }) {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");   // ✅ on passe à email
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
@@ -12,23 +13,19 @@ export default function LoginView({ onSuccess, goRegister, goHome }) {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+      setError(null);
+
+      const res = await api.post("/auth/login", {
+        email,          // ✅ envoi email
+        password
       });
 
-      const data = await res.json();
+      onSuccess(res.data.token);
 
-      if (!res.ok) {
-        setError(data.message);
-        return;
-      }
-
-      onSuccess(data.token);
-
-    } catch {
-      setError("Login failed");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Login failed"
+      );
     }
   };
 
@@ -42,10 +39,12 @@ export default function LoginView({ onSuccess, goRegister, goHome }) {
 
         {error && <p className="error">{error}</p>}
 
+        {/* ✅ CHAMP EMAIL */}
         <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <input

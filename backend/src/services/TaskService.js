@@ -2,6 +2,7 @@ const prisma = require("../config/prisma");
 const Task = require("../domain/Task");
 
 class TaskService {
+
   async create(userId, data) {
     const task = new Task({ ...data });
     task.validate();
@@ -11,18 +12,16 @@ class TaskService {
         title: task.title,
         priority: task.priority,
         completed: false,
-        userId: userId,
+        userId: Number(userId),
         themeId: data.themeId || null
       },
-      include: {
-        theme: true
-      }
+      include: { theme: true }
     });
   }
 
   async list(userId) {
     return prisma.task.findMany({
-      where: { userId: String(userId) },
+      where: { userId: Number(userId) },
       include: { theme: true },
       orderBy: { createdAt: "desc" }
     });
@@ -30,7 +29,7 @@ class TaskService {
 
   async update(userId, id, data) {
     const existing = await prisma.task.findFirst({
-      where: { id, userId: String(userId) }
+      where: { id, userId: Number(userId) }
     });
 
     if (!existing) throw new Error("NotFound");
@@ -46,23 +45,19 @@ class TaskService {
         priority: task.priority,
         themeId: data.themeId ?? existing.themeId
       },
-      include: {
-        theme: true
-      }
+      include: { theme: true }
     });
   }
 
   async remove(userId, id) {
     const existing = await prisma.task.findFirst({
-    where: {id:id,  userId: userId }
-
+      where: { id, userId: Number(userId) }
     });
 
     if (!existing) throw new Error("NotFound");
 
     await prisma.task.delete({
-      where: { id, userId: userId }
-  
+      where: { id }
     });
   }
 }
