@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 node_modules/ 
 .env 
 dist/ 
 build/ 
+=======
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+>>>>>>> ae6432d (refactor(backend): clean architecture improvements)
