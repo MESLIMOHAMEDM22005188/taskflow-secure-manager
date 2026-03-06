@@ -7,6 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
@@ -28,18 +38,19 @@ model Theme {
   createdAt DateTime @default(now())
 }
 model Task {
-  id        String   @id @default(uuid())
+  id        String       @id @default(uuid())
   title     String
-  priority  String
-  completed Boolean  @default(false)
+  status    TaskStatus   @default(TODO)
+  priority  TaskPriority @default(MEDIUM)
+  completed Boolean      @default(false)
 
   userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   themeId   String?
-  theme     Theme?   @relation(fields: [themeId], references: [id])
+  theme     Theme?       @relation(fields: [themeId], references: [id])
 
-  createdAt DateTime @default(now())
+  createdAt DateTime     @default(now())
 }
 
 
