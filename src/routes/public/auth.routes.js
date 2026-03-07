@@ -7,18 +7,21 @@ const validateBody = require("../../middlewares/validateBody");
 const userController = require("../../controllers/user.controller");
 const { updateUsernameSchema, updatePasswordSchema } = require("../../validators/userValidator");
 
-router.use(auth);
+// Profile
+router.get("/me", auth, userController.getProfile);
 
-router.get("/me", userController.getProfile);
-
+// Update username
 router.patch(
   "/username",
+  auth,
   validateBody(updateUsernameSchema),
   userController.updateUsername
 );
 
+// Update password
 router.patch(
   "/password",
+  auth,
   validateBody(updatePasswordSchema),
   userController.updatePassword
 );
