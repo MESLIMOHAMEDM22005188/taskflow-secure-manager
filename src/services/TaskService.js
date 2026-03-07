@@ -11,7 +11,7 @@ class TaskService {
     return prisma.task.create({
       data: {
         title: task.title,
-        priority: task.priority,
+        priority: task.priority?.toUpperCase(),
         completed: false,
         userId: Number(userId),
         themeId: data.themeId || null
@@ -70,8 +70,7 @@ select: {
       data: {
         completed: data.completed ?? existing.completed,
         title: task.title,
-        priority: task.priority,
-        themeId: data.themeId ?? existing.themeId
+priority: task.priority?.toUpperCase(),        themeId: data.themeId ?? existing.themeId
       },
       include: { theme: true }
     });

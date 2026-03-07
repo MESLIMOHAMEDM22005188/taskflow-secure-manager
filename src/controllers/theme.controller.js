@@ -14,11 +14,9 @@ exports.create = async (req, res) => {
 
 exports.list = async (req, res) => {
   try {
-    console.log("USER ID:", req.user);
 
     const themes = await themeService.list(req.user.userId);
 
-    console.log("THEMES:", themes);
 
     res.json({ themes });
   } catch (e) {

@@ -3,6 +3,7 @@ const prisma = require("../config/prisma");
 
 class ThemeService {
   async create(userId, data) {
+
   if (!data.name || !data.color) {
     throw new Error("Name and color are required");
   }
@@ -18,21 +19,19 @@ class ThemeService {
     trimmedName.slice(1).toLowerCase();
 
   const existing = await prisma.theme.findFirst({
-  where: {
-    userId: userId,
-    name: formattedName
-  }
-});
-
+    where: {
+      userId: Number(userId),
+      name: formattedName
+    }
+  });
 
   if (existing) {
     throw new Error("Theme with this name already exists");
   }
 
   const count = await prisma.theme.count({
-where: { id, userId: Number(userId) }
-
-});
+    where: { userId: Number(userId) }
+  });
 
   if (count >= 7) {
     throw new Error("Maximum of 7 themes allowed");
