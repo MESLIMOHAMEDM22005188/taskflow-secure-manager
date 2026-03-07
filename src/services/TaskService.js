@@ -54,27 +54,36 @@ select: {
 }
 
   async update(userId, id, data) {
-    const existing = await prisma.task.findFirst({
-      where: { id, userId: Number(userId) }
-    });
 
-    if (!existing) {
-      throw new NotFoundError("Task not found");
-    }
+  const existing = await prisma.task.findFirst({
+    where: { id: Number(id), userId: Number(userId) }
+  });
 
-    const task = new Task({ ...existing, ...data });
-    task.validate();
-
-    return prisma.task.update({
-      where: { id },
-      data: {
-        completed: data.completed ?? existing.completed,
-        title: task.title,
-priority: task.priority?.toUpperCase(),        themeId: data.themeId ?? existing.themeId
-      },
-      include: { theme: true }
-    });
+  if (!existing) {
+    throw new NotFoundError("Task not found");
   }
+
+  return prisma.task.update({
+    where: { id: Number(id) },
+    data: {
+      completed: data.completed ?? existing.completed,
+      title: data.title ?? existing.title,
+      priority: data.priority
+        ? data.priority.toUpperCase()
+        : existing.priority,
+      themeId: data.themeId ?? existing.themeId
+    },
+    include: {
+      theme: {
+        select: {
+          id: true,
+          name: true,
+          color: true
+        }
+      }
+    }
+  });
+}
 
   async remove(userId, id) {
     const existing = await prisma.task.findFirst({
