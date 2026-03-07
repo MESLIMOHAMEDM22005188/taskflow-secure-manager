@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const Task = require("../domain/Task");
+const NotFoundError = require("../errors/NotFoundError");
 
 class TaskService {
 
@@ -15,24 +16,51 @@ class TaskService {
         userId: Number(userId),
         themeId: data.themeId || null
       },
-      include: { theme: true }
-    });
+select: {
+  id: true,
+  title: true,
+  priority: true,
+  completed: true,
+  createdAt: true,
+  theme: {
+    select: {
+      id: true,
+      name: true,
+      color: true
+    }
+  }
+}    });
   }
 
   async list(userId) {
-    return prisma.task.findMany({
-      where: { userId: Number(userId) },
-      include: { theme: true },
-      orderBy: { createdAt: "desc" }
-    });
-  }
+  return prisma.task.findMany({
+    where: { userId: Number(userId) },
+    select: {
+      id: true,
+      title: true,
+      priority: true,
+      completed: true,
+      createdAt: true,
+      theme: {
+        select: {
+          id: true,
+          name: true,
+          color: true
+        }
+      }
+    },
+    orderBy: { createdAt: "desc" }
+  });
+}
 
   async update(userId, id, data) {
     const existing = await prisma.task.findFirst({
       where: { id, userId: Number(userId) }
     });
 
-    if (!existing) throw new Error("NotFound");
+    if (!existing) {
+      throw new NotFoundError("Task not found");
+    }
 
     const task = new Task({ ...existing, ...data });
     task.validate();
@@ -54,7 +82,9 @@ class TaskService {
       where: { id, userId: Number(userId) }
     });
 
-    if (!existing) throw new Error("NotFound");
+    if (!existing) {
+      throw new NotFoundError("Task not found");
+    }
 
     await prisma.task.delete({
       where: { id }

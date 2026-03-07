@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^6.19.2",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -21,7 +21,6 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1",
     "morgan": "^1.10.1",
-    "prisma": "^5.22.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -32,7 +31,8 @@
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.4.0",
     "nodemon": "^3.1.14",
-    "prettier": "^3.8.1"
+    "prettier": "^3.8.1",
+    "prisma": "^6.19.2"
   },
   "description": ""
 }

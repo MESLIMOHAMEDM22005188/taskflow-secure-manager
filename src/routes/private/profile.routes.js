@@ -1,15 +1,16 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
-const auth = require("../middleware/auth");
+const auth = require("../../middlewares/auth");
 
-const prisma = require("../config/prisma");
+const prisma = require("../../config/prisma");
 const router = express.Router();
 
 router.get("/dashboard", auth, async (req, res) => {
   try {
     const userId = req.userId;
 
-    // User basic info
+    // User b
+    // asic info
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {

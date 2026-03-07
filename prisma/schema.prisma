@@ -32,11 +32,15 @@ model Theme {
   id        String   @id @default(uuid())
   name      String
   color     String
+
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   tasks     Task[]
+
   createdAt DateTime @default(now())
 }
+
 model Task {
   id        String       @id @default(uuid())
   title     String

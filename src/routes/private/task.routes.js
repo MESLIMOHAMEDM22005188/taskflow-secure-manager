@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middlewares/auth");
-const task = require("../controllers/task.controller");
+const auth = require("../../middlewares/auth");
+const task = require("../../controllers/task.controller");
 
 router.use(auth);
 router.post("/", task.create);

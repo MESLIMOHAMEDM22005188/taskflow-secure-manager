@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const auth = require("../middlewares/auth");
-const themeController = require("../controllers/theme.controller");
+const auth = require("../../middlewares/auth");
+const themeController = require("../../controllers/theme.controller");
 
 router.use(auth);
 router.post("/", themeController.create);

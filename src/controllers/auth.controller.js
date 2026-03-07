@@ -53,48 +53,40 @@ if (!result.success) {
 
 exports.login = async (req, res) => {
   try {
-    console.log("===== LOGIN ATTEMPT =====");
-    console.log("BODY:", req.body);
 
     const { username, password } = req.body;
 
     if (!username || !password) {
-      console.log("❌ Missing fields");
       return res.status(400).json({ message: "Missing fields" });
     }
 
-    console.log("🔍 Searching user:", username);
 
     const user = await prisma.user.findUnique({
       where: { username }
     });
 
-    console.log("USER FROM DB:", user);
 
     if (!user) {
-      console.log("❌ User not found");
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    console.log("🔐 Comparing passwords...");
     const ok = await bcrypt.compare(password, user.password);
 
-    console.log("PASSWORD MATCH:", ok);
 
     if (!ok) {
-      console.log("❌ Password mismatch");
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    console.log("✅ Password correct, generating token");
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+const jwtConfig = require("../config/jwt");
+
+jwt.sign(payload, jwtConfig.accessSecret, {
+  expiresIn: jwtConfig.accessExpiresIn
+});      { expiresIn: "1d" }
     );
 
-    console.log("TOKEN GENERATED");
 
     return res.json({
       message: "Login ok",
