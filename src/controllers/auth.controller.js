@@ -3,54 +3,61 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
+  console.log("📥 REGISTER REQUEST BODY:", req.body);
+
   try {
-    const { username, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ message: "Username and password required" });
-    }
+    const { username, email, password } = req.body;
 
-    const existing = await prisma.user.findUnique({
-      where: { username }
+    console.log("🔎 Extracted fields:", { username, email, password });
+
+    const existingUser = await prisma.user.findFirst({
+      where: { email }
     });
-    const { registerSchema } = require("../validators/authValidator");
 
-const result = registerSchema.safeParse(req.body);
+    console.log("👤 Existing user:", existingUser);
 
-if (!result.success) {
-  return res.status(400).json({ error: result.error.errors });
-}
-
-    if (existing) {
-      return res.status(400).json({ message: "Username already taken" });
+    if (existingUser) {
+      console.log("❌ EMAIL ALREADY EXISTS");
+      return res.status(400).json({
+        message: "Email already used"
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    console.log("🔐 Password hashed");
+
     const user = await prisma.user.create({
       data: {
         username,
+        email,
         password: hashedPassword
       }
     });
 
+    console.log("✅ USER CREATED:", user.id);
+
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "7d" }
     );
 
-    return res.status(201).json({
-      message: "Account created",
-      token
-    });
+    console.log("🎟 TOKEN GENERATED");
 
-  } catch (error) {
-    console.error("REGISTER ERROR:", error);
-    return res.status(500).json({ message: "Server error" });
+    res.json({ token });
+
+  } catch (err) {
+
+    console.error("🔥 REGISTER SERVER ERROR:", err);
+
+    res.status(500).json({
+      message: "Registration failed",
+      error: err.message
+    });
   }
 };
-
 exports.login = async (req, res) => {
   try {
 
@@ -80,13 +87,14 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign(
       { userId: user.id, role: user.role },
-const jwtConfig = require("../config/jwt");
+      { expiresIn: "1d" }
+    );
+
+    const jwtConfig = require("../config/jwt");
 
 jwt.sign(payload, jwtConfig.accessSecret, {
   expiresIn: jwtConfig.accessExpiresIn
-});      { expiresIn: "1d" }
-    );
-
+});
 
     return res.json({
       message: "Login ok",

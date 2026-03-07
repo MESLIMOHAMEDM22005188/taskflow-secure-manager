@@ -11,8 +11,9 @@ exports.create = async (req, res) => {
 };
 
 exports.list = async (req, res) => {
+  const TaskDTO = require("../dtos/task.dto");
   const tasks = await taskService.list(req.user.userId);
-  res.json({ tasks });
+  res.json(TaskDTO.fromEntities(tasks));
 };
 
 exports.update = async (req, res) => {

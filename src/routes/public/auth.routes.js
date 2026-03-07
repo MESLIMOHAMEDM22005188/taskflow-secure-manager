@@ -1,29 +1,22 @@
 const express = require("express");
 const router = express.Router();
 
-const auth = require("../../middlewares/auth");
-const validateBody = require("../../middlewares/validateBody");
+const authController = require("../../controllers/auth.controller");
 
-const userController = require("../../controllers/user.controller");
-const { updateUsernameSchema, updatePasswordSchema } = require("../../validators/userValidator");
+console.log("📡 AUTH ROUTES LOADED");
 
-// Profile
-router.get("/me", auth, userController.getProfile);
+// REGISTER
+router.post("/register", (req, res, next) => {
+  console.log("📥 POST /api/auth/register");
+  console.log("BODY:", req.body);
+  next();
+}, authController.register);
 
-// Update username
-router.patch(
-  "/username",
-  auth,
-  validateBody(updateUsernameSchema),
-  userController.updateUsername
-);
-
-// Update password
-router.patch(
-  "/password",
-  auth,
-  validateBody(updatePasswordSchema),
-  userController.updatePassword
-);
+// LOGIN
+router.post("/login", (req, res, next) => {
+  console.log("📥 POST /api/auth/login");
+  console.log("BODY:", req.body);
+  next();
+}, authController.login);
 
 module.exports = router;
